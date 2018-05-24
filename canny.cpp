@@ -457,6 +457,9 @@ void DoubleThreshold(Mat &Input,uchar LowThreshod,uchar highThreshold){
 				data[j] = 0;
 			}
 		}
+		if(i == 0){
+			cout << int(data[510]) << " "<< int(data[51]) << endl;
+		}
 	}
 }
 void simd_DoubleThreshold(Mat &Input,uchar LowThreshod,uchar highThreshold){
@@ -472,7 +475,7 @@ void simd_DoubleThreshold(Mat &Input,uchar LowThreshod,uchar highThreshold){
  			sub_max = _mm_sub_epi8(loaded8, _mm_set1_epi8(highThreshold));
  			mask_hi = _mm_cmpgt_epi8(sub_max,_mm_setzero_si128());//submax>0 8位全1，否则全0
  			mask_lo = _mm_cmpgt_epi8(sub_min,_mm_setzero_si128());//submin<=0,8位全0，否则全1
- 			loaded8 = _mm_and_si128(loaded8, mask_combinedlo);
+ 			loaded8 = _mm_and_si128(loaded8, mask_lo);
  			loaded8 = _mm_or_si128(loaded8,mask_hi);
  			_mm_storeu_si128((__m128i *)(data + j), loaded8);
  			//cout << "i: " << i << "j: "<< j << endl;
@@ -487,7 +490,9 @@ void simd_DoubleThreshold(Mat &Input,uchar LowThreshod,uchar highThreshold){
 				data[j] = 0;
 			}
 		}
-		//cout << i << endl;
+		if(i == 0){
+			cout << int(data[510]) << " "<< int(data[51]) << endl;
+		}
 	 }
 }
 void DoubleThresholdLink(Mat &imageInput,double lowThreshold,double highThreshold)  

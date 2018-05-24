@@ -89,24 +89,30 @@ int main(int argc,char* argv[]){
 	
 	
 	Mat inhibit_Output = GaussIMG;
+	Mat inhibit_Output1 = GaussIMG;
 	cout <<"+++++++++++++++++++++++++++++++" << endl;
 	cout << "Inhibit local Max ...." << endl;//局部非极大值抑制
 	gettimeofday(&start,NULL);
 	inhibit_local_Max(SobelXY,inhibit_Output,pointDirection);
 	gettimeofday(&end,NULL);
+	inhibit_local_Max(SobelXY,inhibit_Output1,pointDirection);
+
 	time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);
 	cout << "Inhibit local Max time: " << time_use << "us" << endl << endl;
 	sum_time += time_use;
 	simd_time += time_use;
-
+	//write_pgm_image(inhibit_name,inhibit_Output);
+	//
 	cout <<"+++++++++++++++++++++++++++++++" << endl;	
 	cout << "Scalar DoubleThresholding...." << endl;//双阙值限制
 	gettimeofday(&start,NULL);
-	DoubleThreshold(inhibit_Output,lowthreshold,highthreshold);
+	DoubleThreshold(inhibit_Output1,lowthreshold,highthreshold);
 	gettimeofday(&end,NULL);
 	time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);
 	cout << "DoubleThreshold time: " << time_use << "us" << endl << endl;
 	sum_time += time_use;
+	write_pgm_image(inhibit_name + "no_simd",inhibit_Output1);
+
 
 	cout << "Simd DoubleThresholding...." << endl;//SIMD双阙值限制
 	gettimeofday(&start,NULL);
