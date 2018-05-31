@@ -1,4 +1,5 @@
 #运行环境
+---------
 - 	命令行即可编译/运行
 -  不过，若需要自行编译，则需要进去make文件中把CCflags中的-I后的参数改为opencv头文件在电脑中的安装位置。
 -  运行program，进入程序.
@@ -6,16 +7,21 @@
 	[github ssemathfun](https://github.com/to-miz/sse_mathfun_extension.git)
 	
 #使用的SIMD指令集
+-----
 -	基本使用的是SSE、SSE2、SSE3、SSE4.1系列的指令集，使用的是128位的向量寄存器。
 
 #优化函数介绍
+----
 ##不足之处
+-----
 -	思前想后，觉得还是先说一些不足之处吧。虽然多数函数进行了SIMD优化，但是一些较为复杂的函数，比如高斯滤波函数以及极大值抑制函数暂时想不出如何处理多层循环嵌套+不可预测分支的程序向量化的思路，因此没有进行SIMD优化。而正因为逻辑较为复杂，所以这两个函数恰好就是程序中计算复杂度最高的，所以这个我的SIMD实现中，它的加速比只有23%。
 
 ##优化思路
+----
 -	现在来介绍一下这次在算法中的每个函数的具体优化过程。
 
 ###高斯核生成
+----
 -	高斯核的生成，其实是根据高斯公式得来的。这里生成的是二维高斯核。
 公式如下：
 ![](gaussian_kernel)
@@ -99,6 +105,7 @@ Mat simd_to_create(int ksize,float sigma){
 }
 ```
 ###Sobel算子计算梯度
+----
 -	在canny算法中除了极大值抑制以及高斯滤波之外，计算耗时较高的函数就是Sobel算子计算梯度了。
 - Sobel算子是一离散性差分算子，用来运算图像亮度函数的灰度之近似值。在图像的任何一点使用此算子，将会产生对应的灰度矢量或是其法矢量。
 - 主要的计算过程：
@@ -303,6 +310,7 @@ void simd_SobelGradDirection(const Mat src,Mat &sobelx,Mat &sobely,float *pointD
 ```
 
 ###Sobel算子计算幅值
+------
 -	使用如下公式进行计算即可：
 	![](/Users/chen/study/超级计算机原理与操作/canny_simd/tidu)
 	
@@ -342,6 +350,7 @@ void simd_SobelAmplitude(Mat &sobelx,Mat &sobely,Mat &SobelXY){
 ```
 
 ###双阙值抑制
+------
 
 -	该算法就是对于我们所指定的一高一低两个阙值，这俩个值决定了一个范围。对于图像中的某个元素的值大于最大值时，将该值设为255，小于最低值则设为0。
 
@@ -428,6 +437,7 @@ void simd_DoubleThreshold(Mat &Input,uchar LowThreshod,uchar highThreshold){
 ```
 
 ###一些小技巧：
+------
 -	由于Mat结构中存下的元素访问时是使用uchar类型的，一个uchar类型8位，所以在导入的时候我们一次会加载16个uchar类型，这个时候我们需要判断接下来的操作需不需要将uchar转为float，如果需要我们可以有下列的操作转化：
 
 ```cpp
@@ -452,6 +462,7 @@ mm_storeu_si128((__m128i *)(data + j), loaded8);
 ```
 
 #实验结果
+=====
 
 -	最后实验结果：
 
